@@ -1,0 +1,15 @@
+Placeholder file for onboarding images.
+
+To add actual images for the onboarding screens, place the following files in this directory:
+
+1. onboarding1.png - For the first onboarding screen (Welcome to Legal Network)
+2. onboarding2.png - For the second onboarding screen (Manage Cases Efficiently)
+3. onboarding3.png - For the third onboarding screen (Connect with Professionals)
+
+Recommended image specifications:
+- Format: PNG or JPEG
+- Size: 300x200 pixels or similar aspect ratio
+- Content: Legal-themed illustrations or icons
+- Style: Professional, clean, and modern
+
+For now, the app will show placeholder containers with instructions until actual images are added. 

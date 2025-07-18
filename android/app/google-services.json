@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "10659567570",
+    "project_id": "legal-network-ad078",
+    "storage_bucket": "legal-network-ad078.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:10659567570:android:145f46bdf231908d5bda0b",
+        "android_client_info": {
+          "package_name": "com.legalnetwork.leagel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9UOEg2-Egvrt8vUBE-1Q81TRrNS-EByA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
