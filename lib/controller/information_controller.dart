@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:leagel_1/app/hello_screen.dart';
 import 'package:leagel_1/utils/show_toast_dialog.dart';
 import 'package:leagel_1/model/user_model.dart';
+import 'package:leagel_1/model/city_model.dart';
+import 'package:leagel_1/model/court_model.dart';
 import 'package:leagel_1/utils/fire_store_utils.dart';
 import 'package:leagel_1/utils/notification_service.dart';
 import 'package:leagel_1/utils/firebase_test.dart';
@@ -36,8 +38,12 @@ class InformationController extends GetxController {
   RxString selectedUserType = "individual".obs; // "individual" or "law_firm"
   RxList<String> selectedSpecializations = <String>[].obs;
   RxBool isAddressPublic = true.obs;
-  RxString selectedLanguage = "english".obs; // "english" or "hindi"
+  RxList<String> selectedLanguages = <String>[].obs; // List of selected languages (max 2)
   RxBool isLoading = false.obs;
+  
+  // New reactive variables for searchable dropdowns
+  Rx<City?> selectedCity = Rx<City?>(null);
+  Rx<Court?> selectedCourt = Rx<Court?>(null);
 
   Rx<UserModel> userModel = UserModel().obs;
 
@@ -81,8 +87,8 @@ class InformationController extends GetxController {
         if (userModel.value.userType != null) {
           selectedUserType.value = userModel.value.userType!;
         }
-        if (userModel.value.language != null) {
-          selectedLanguage.value = userModel.value.language!;
+        if (userModel.value.languages != null) {
+          selectedLanguages.value = userModel.value.languages!;
         }
         if (userModel.value.isAddressPublic != null) {
           isAddressPublic.value = userModel.value.isAddressPublic!;
@@ -119,7 +125,8 @@ class InformationController extends GetxController {
         selectedSpecializations.isEmpty ||
         cityController.text.trim().isEmpty ||
         completeAddressController.text.trim().isEmpty ||
-        yearsOfExperienceController.text.trim().isEmpty) {
+        yearsOfExperienceController.text.trim().isEmpty ||
+        selectedLanguages.isEmpty) {
       ShowToastDialog.showToast("Please fill all required fields");
       return false;
     }
@@ -129,14 +136,31 @@ class InformationController extends GetxController {
       return false;
     }
     
+    if (selectedSpecializations.length > 3) {
+      ShowToastDialog.showToast("You can select maximum 3 specializations");
+      return false;
+    }
+    
+    if (selectedLanguages.length > 2) {
+      ShowToastDialog.showToast("You can select maximum 2 languages");
+      return false;
+    }
+    
+    // Validate years of experience
+    final int? years = int.tryParse(yearsOfExperienceController.text.trim());
+    if (years == null || years < 0 || years > 99) {
+      ShowToastDialog.showToast("Please enter valid years of experience (0-99)");
+      return false;
+    }
+    
     return true;
   }
 
-  // Method for handling specialization selection
+  // Method for handling specialization selection (max 3)
   void toggleSpecialization(String specialization) {
     if (selectedSpecializations.contains(specialization)) {
       selectedSpecializations.remove(specialization);
-    } else {
+    } else if (selectedSpecializations.length < 3) {
       selectedSpecializations.add(specialization);
     }
     update();
@@ -148,11 +172,29 @@ class InformationController extends GetxController {
     update();
   }
 
-  // Method for handling language selection
-  void selectLanguage(String language) {
-    selectedLanguage.value = language;
+  // Method for handling language selection (max 2)
+  void toggleLanguage(String language) {
+    if (selectedLanguages.contains(language)) {
+      selectedLanguages.remove(language);
+    } else if (selectedLanguages.length < 2) {
+      selectedLanguages.add(language);
+    }
     update();
   }
+
+  // Popular languages list
+  List<String> get popularLanguages => [
+    'English',
+    'Hindi',
+    'Tamil',
+    'Telugu',
+    'Marathi',
+    'Gujarati',
+    'Kannada',
+    'Bengali',
+    'Malayalam',
+    'Punjabi',
+  ];
 
   // Method for toggling address visibility
   void toggleAddressVisibility() {
@@ -231,7 +273,7 @@ class InformationController extends GetxController {
         completeAddress: completeAddressController.text.trim(),
         isAddressPublic: isAddressPublic.value,
         yearsOfExperience: yearsOfExperienceController.text.trim(),
-        language: selectedLanguage.value,
+        languages: selectedLanguages.toList(),
       );
 
       print('Attempting to save user data for UID: $currentUid');
@@ -331,14 +373,18 @@ class InformationController extends GetxController {
       print('Completing registration...');
       ShowToastDialog.showToast("Welcome to Legal Network! You can now explore the app.");
       
-      // Navigate to hello screen
+      // Navigate to hello screen with proper context check
       Future.delayed(const Duration(milliseconds: 500), () {
-        Get.offAll(() => const HelloScreen());
+        if (Get.context != null) {
+          Get.offAll(() => const HelloScreen());
+        }
       });
     } catch (e) {
       print('Error completing registration: $e');
       ShowToastDialog.showToast("Registration completed successfully!");
-      Get.offAll(() => const HelloScreen());
+      if (Get.context != null) {
+        Get.offAll(() => const HelloScreen());
+      }
     }
   }
 
@@ -348,6 +394,37 @@ class InformationController extends GetxController {
     // For now, returning the local path
     return file.path;
   }
+
+  // City selection methods
+  void onCitySelected(City? city) {
+    selectedCity.value = city;
+    if (city != null) {
+      cityController.text = city.city;
+      // Clear selected court when city changes
+      selectedCourt.value = null;
+      courtsController.clear();
+    } else {
+      cityController.clear();
+    }
+  }
+
+  // Court selection methods
+  void onCourtSelected(Court? court) {
+    selectedCourt.value = court;
+    if (court != null) {
+      courtsController.text = court.courtName;
+      // Auto-select city if court is selected and city is not selected
+      if (selectedCity.value == null) {
+        // Since Court model only has state, we need to find a city from that state
+        // For now, we'll just set the city controller to the state name
+        cityController.text = court.state;
+      }
+    } else {
+      courtsController.clear();
+    }
+  }
+
+
 
   @override
   void onClose() {

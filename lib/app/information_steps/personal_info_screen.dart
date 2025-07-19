@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:leagel_1/controller/information_controller.dart';
+import 'package:leagel_1/app/widgets/searchable_city_dropdown.dart';
+import 'package:leagel_1/app/widgets/searchable_court_dropdown.dart';
 
 class PersonalInfoScreen extends StatelessWidget {
   const PersonalInfoScreen({super.key});
@@ -59,69 +61,46 @@ class PersonalInfoScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Obx(() => Row(
+              Obx(() => Column(
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => controller.selectUserType('individual'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: controller.selectedUserType.value == 'individual' 
-                              ? Colors.blue.shade50
-                              : Colors.grey.shade50,
-                          border: Border.all(
-                            color: controller.selectedUserType.value == 'individual' 
-                                ? Colors.blue
-                                : Colors.grey.shade300,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Individual Lawyer',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: controller.selectedUserType.value == 'individual' 
-                                  ? Colors.blue
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text(
+                      'Individual Lawyer',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
+                    leading: Radio<String>(
+                      value: 'individual',
+                      groupValue: controller.selectedUserType.value,
+                      onChanged: (String? value) {
+                        if (value != null) {
+                          controller.selectUserType(value);
+                        }
+                      },
+                      activeColor: Colors.blue,
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => controller.selectUserType('law_firm'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: controller.selectedUserType.value == 'law_firm' 
-                              ? Colors.blue.shade50
-                              : Colors.grey.shade50,
-                          border: Border.all(
-                            color: controller.selectedUserType.value == 'law_firm' 
-                                ? Colors.blue
-                                : Colors.grey.shade300,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Law Firm',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: controller.selectedUserType.value == 'law_firm' 
-                                  ? Colors.blue
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text(
+                      'Law Firm',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
+                    ),
+                    leading: Radio<String>(
+                      value: 'law_firm',
+                      groupValue: controller.selectedUserType.value,
+                      onChanged: (String? value) {
+                        if (value != null) {
+                          controller.selectUserType(value);
+                        }
+                      },
+                      activeColor: Colors.blue,
                     ),
                   ),
                 ],
@@ -344,6 +323,39 @@ class PersonalInfoScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // City
+              const Text(
+                'City',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Obx(() => SearchableCityDropdown(
+                selectedCity: controller.selectedCity.value,
+                onCitySelected: controller.onCitySelected,
+                decoration: InputDecoration(
+                  hintText: 'Search for your city...',
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                ),
+              )),
+              const SizedBox(height: 24),
               
               // Courts
               const Text(
@@ -355,10 +367,12 @@ class PersonalInfoScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: controller.courtsController,
+              Obx(() => SearchableCourtDropdown(
+                selectedCourt: controller.selectedCourt.value,
+                onCourtSelected: controller.onCourtSelected,
+                filterByState: controller.selectedCity.value?.state,
                 decoration: InputDecoration(
-                  hintText: 'Enter courts (comma separated)',
+                  hintText: 'Search for a court...',
                   filled: true,
                   fillColor: Colors.grey.shade50,
                   border: OutlineInputBorder(
@@ -374,46 +388,10 @@ class PersonalInfoScreen extends StatelessWidget {
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
                 ),
-              ),
+              )),
               const SizedBox(height: 24),
               
-              // City
-              const Text(
-                'City',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: controller.cityController,
-                decoration: InputDecoration(
-                  hintText: 'Enter your city',
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your city';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
+                  
               
               // Complete Address
               const Text(
@@ -488,6 +466,7 @@ class PersonalInfoScreen extends StatelessWidget {
               TextFormField(
                 controller: controller.yearsOfExperienceController,
                 keyboardType: TextInputType.number,
+                maxLength: 2,
                 decoration: InputDecoration(
                   hintText: 'Enter years of experience',
                   filled: true,
@@ -504,10 +483,15 @@ class PersonalInfoScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.blue),
                   ),
+                  counterText: '',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your years of experience';
+                  }
+                  final int? years = int.tryParse(value);
+                  if (years == null || years < 0 || years > 99) {
+                    return 'Please enter a valid number (0-99)';
                   }
                   return null;
                 },
@@ -516,7 +500,7 @@ class PersonalInfoScreen extends StatelessWidget {
               
               // Language Selection
               const Text(
-                'Language',
+                'Languages (Select up to 2)',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -524,73 +508,7 @@ class PersonalInfoScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Obx(() => Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => controller.selectLanguage('english'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: controller.selectedLanguage.value == 'english' 
-                              ? Colors.blue.shade50
-                              : Colors.grey.shade50,
-                          border: Border.all(
-                            color: controller.selectedLanguage.value == 'english' 
-                                ? Colors.blue
-                                : Colors.grey.shade300,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'English',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: controller.selectedLanguage.value == 'english' 
-                                  ? Colors.blue
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => controller.selectLanguage('hindi'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: controller.selectedLanguage.value == 'hindi' 
-                              ? Colors.blue.shade50
-                              : Colors.grey.shade50,
-                          border: Border.all(
-                            color: controller.selectedLanguage.value == 'hindi' 
-                                ? Colors.blue
-                                : Colors.grey.shade300,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Hindi',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: controller.selectedLanguage.value == 'hindi' 
-                                  ? Colors.blue
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )),
+              Obx(() => _buildLanguageSelection(controller)),
               const SizedBox(height: 24),
               
               // Bio
@@ -700,7 +618,7 @@ class PersonalInfoScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Select your specializations (you can select multiple)',
+                'Select your specializations (you can select upto 3)',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -712,14 +630,15 @@ class PersonalInfoScreen extends StatelessWidget {
                 runSpacing: 8,
                 children: specializations.map((specialization) {
                   final isSelected = controller.selectedSpecializations.contains(specialization);
+                  final canSelect = controller.selectedSpecializations.length < 3 || isSelected;
                   return GestureDetector(
-                    onTap: () => controller.toggleSpecialization(specialization),
+                    onTap: canSelect ? () => controller.toggleSpecialization(specialization) : null,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.blue.shade50 : Colors.white,
+                        color: isSelected ? Colors.blue.shade50 : (canSelect ? Colors.white : Colors.grey.shade100),
                         border: Border.all(
-                          color: isSelected ? Colors.blue : Colors.grey.shade300,
+                          color: isSelected ? Colors.blue : (canSelect ? Colors.grey.shade300 : Colors.grey.shade200),
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -728,7 +647,7 @@ class PersonalInfoScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.blue : Colors.black,
+                          color: isSelected ? Colors.blue : (canSelect ? Colors.black : Colors.grey.shade400),
                         ),
                       ),
                     ),
@@ -743,6 +662,74 @@ class PersonalInfoScreen extends StatelessWidget {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               'Please select at least one specialization',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.red,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildLanguageSelection(InformationController controller) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select languages (you can select up to 2)',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: controller.popularLanguages.map((language) {
+                  final isSelected = controller.selectedLanguages.contains(language);
+                  final canSelect = controller.selectedLanguages.length < 2 || isSelected;
+                  return GestureDetector(
+                    onTap: canSelect ? () => controller.toggleLanguage(language) : null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? Colors.blue.shade50 : (canSelect ? Colors.white : Colors.grey.shade100),
+                        border: Border.all(
+                          color: isSelected ? Colors.blue : (canSelect ? Colors.grey.shade300 : Colors.grey.shade200),
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        language,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected ? Colors.blue : (canSelect ? Colors.black : Colors.grey.shade400),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+        if (controller.selectedLanguages.isEmpty)
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              'Please select at least one language',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.red,

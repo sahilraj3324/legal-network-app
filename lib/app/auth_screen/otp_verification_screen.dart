@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 import 'package:get/get.dart';
 import '../../utils/firebase_service.dart';
 import '../information_screen/information_screen.dart';
@@ -35,7 +34,6 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   void initState() {
     super.initState();
     _startResendTimer();
-    _autoFetchOTP();
   }
 
   void _startResendTimer() {
@@ -49,47 +47,6 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         _startResendTimer();
       }
     });
-  }
-
-  void _autoFetchOTP() async {
-    if (_isDisposed) return;
-    
-    try {
-      // Listen for incoming SMS
-      await SmsAutoFill().listenForCode();
-      
-      // Get the SMS code automatically
-      final signature = await SmsAutoFill().getAppSignature;
-      print('App signature: $signature');
-      
-      // Listen for OTP from SMS
-      SmsAutoFill().code.listen((code) {
-        if (code.isNotEmpty && code.length == 6 && mounted && !_isDisposed) {
-          for (int i = 0; i < code.length; i++) {
-            _otpControllers[i].text = code[i];
-          }
-          if (mounted) {
-            setState(() {});
-            // Auto-verify when OTP is received
-            _verifyOTP();
-          }
-        }
-      });
-    } catch (e) {
-      print('Auto-fetch OTP error: $e');
-      // Fallback simulation for testing
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted && !_isDisposed) {
-          const simulatedOTP = '123456';
-          for (int i = 0; i < simulatedOTP.length; i++) {
-            _otpControllers[i].text = simulatedOTP[i];
-          }
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      });
-    }
   }
 
   @override
@@ -166,8 +123,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                         Color(0xFF000000),
                       ],
                     ).createShader(bounds),
-                        child:  Text(
-                            'What’s The Code You Received From Us?',
+                        child: Text(
+                            'What\'s The Code You Received From Us?',
                             style: GoogleFonts.instrumentSans(
                               fontSize: isTablet ? 32 : (isSmallScreen ? 22 : 28),
                               fontWeight: FontWeight.bold,
@@ -176,8 +133,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                               color: Colors.white,
                             ),
                           ),
-                          ),
-                          ),
+                        ),
+                      ),
 
                           SizedBox(height: isSmallScreen ? 5 : 10),
                           
@@ -232,13 +189,13 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide(
-                                        color: Colors.grey.withValues(alpha: 0.3),
+                                        color: Colors.grey.withOpacity(0.3),
                                       ),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide(
-                                        color: Colors.grey.withValues(alpha: 0.3),
+                                        color: Colors.grey.withOpacity(0.3),
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
@@ -384,38 +341,27 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       _isLoading = true;
     });
     
-    try {
-      // Verify OTP using Firebase
-      FirebaseService.verifyOTP(otp).then((userCredential) {
-        if (!mounted || _isDisposed) return;
-        
-        setState(() {
-          _isLoading = false;
-        });
-        
-        if (userCredential != null) {
-          _showSuccessSnackbar('Phone verified successfully!');
-          // Check if user exists in Firebase
-          Future.delayed(const Duration(milliseconds: 500), () async {
-            if (mounted && !_isDisposed) {
-              await _checkUserExistsAndNavigate();
-            }
-          });
-        } else {
-          _showErrorSnackbar('Verification failed. Please try again.');
-          _clearOTPFields();
-        }
-      }).catchError((e) {
-        if (!mounted || _isDisposed) return;
-        
-        setState(() {
-          _isLoading = false;
-        });
-        
-        _showErrorSnackbar('Invalid OTP. Please try again.');
-        _clearOTPFields();
+    // Verify OTP using Firebase
+    FirebaseService.verifyOTP(otp).then((userCredential) {
+      if (!mounted || _isDisposed) return;
+      
+      setState(() {
+        _isLoading = false;
       });
-    } catch (e) {
+      
+      if (userCredential != null) {
+        _showSuccessSnackbar('Phone verified successfully!');
+        // Check if user exists in Firebase
+        Future.delayed(const Duration(milliseconds: 500), () async {
+          if (mounted && !_isDisposed) {
+            await _checkUserExistsAndNavigate();
+          }
+        });
+      } else {
+        _showErrorSnackbar('Verification failed. Please try again.');
+        _clearOTPFields();
+      }
+    }).catchError((e) {
       if (!mounted || _isDisposed) return;
       
       setState(() {
@@ -424,7 +370,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       
       _showErrorSnackbar('Invalid OTP. Please try again.');
       _clearOTPFields();
-    }
+    });
   }
 
   void _resendOTP() {
@@ -444,7 +390,6 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         });
         _showSuccessSnackbar('OTP sent successfully!');
         _startResendTimer();
-        _autoFetchOTP(); // Listen for new OTP
       },
       onError: (error) {
         if (!mounted || _isDisposed) return;
@@ -486,6 +431,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
   Future<void> _checkUserExistsAndNavigate() async {
     try {
+      // Add a small delay to prevent navigation conflicts with AuthController
+      await Future.delayed(const Duration(milliseconds: 300));
+      
       // Check if user exists in Firebase
       UserModel? existingUser = await FireStoreUtils.getCurrentUser();
       
@@ -494,7 +442,9 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
           existingUser.fullName!.isNotEmpty) {
         // User exists and has completed profile - go to hello screen
         print('User already exists, navigating to hello screen');
-        Get.offAll(() => const HelloScreen());
+        if (Get.context != null) {
+          Get.offAll(() => const HelloScreen());
+        }
       } else {
         // User doesn't exist or hasn't completed profile - go to information screen
         print('User doesn\'t exist, navigating to information screen');
@@ -502,9 +452,11 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         userModel.phoneNumber = widget.phoneNumber;
         userModel.loginType = "phone";
         
-        Get.offAll(() => const InformationScreen(), arguments: {
-          'userModel': userModel,
-        });
+        if (Get.context != null) {
+          Get.offAll(() => const InformationScreen(), arguments: {
+            'userModel': userModel,
+          });
+        }
       }
     } catch (e) {
       print('Error checking user existence: $e');
@@ -513,9 +465,11 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       userModel.phoneNumber = widget.phoneNumber;
       userModel.loginType = "phone";
       
-      Get.offAll(() => const InformationScreen(), arguments: {
-        'userModel': userModel,
-      });
+      if (Get.context != null) {
+        Get.offAll(() => const InformationScreen(), arguments: {
+          'userModel': userModel,
+        });
+      }
     }
   }
 
@@ -558,12 +512,6 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     }
     for (var focusNode in _otpFocusNodes) {
       focusNode.dispose();
-    }
-    
-    try {
-      SmsAutoFill().unregisterListener();
-    } catch (e) {
-      print('Error unregistering SMS listener: $e');
     }
     
     super.dispose();

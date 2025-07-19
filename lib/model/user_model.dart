@@ -27,7 +27,7 @@ class UserModel {
   String? completeAddress;
   bool? isAddressPublic; // true for public, false for private
   String? yearsOfExperience;
-  String? language; // "hindi" or "english"
+  List<String>? languages; // List of selected languages (max 2)
 
   UserModel({
     this.id,
@@ -54,7 +54,7 @@ class UserModel {
     this.completeAddress,
     this.isAddressPublic,
     this.yearsOfExperience,
-    this.language,
+    this.languages,
   });
 
   String getDisplayName() {
@@ -88,7 +88,7 @@ class UserModel {
     completeAddress = json['completeAddress'];
     isAddressPublic = json['isAddressPublic'];
     yearsOfExperience = json['yearsOfExperience'];
-    language = json['language'];
+    languages = json['languages'] != null ? List<String>.from(json['languages']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -121,7 +121,7 @@ class UserModel {
     data['completeAddress'] = completeAddress;
     data['isAddressPublic'] = isAddressPublic;
     data['yearsOfExperience'] = yearsOfExperience;
-    data['language'] = language;
+    data['languages'] = languages;
     
     return data;
   }

@@ -1,0 +1,10 @@
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=YOUR_KEY_ALIAS
+storeFile=../path/to/your/keystore.jks
+
+# Instructions:
+# 1. Copy this file to 'key.properties' (remove .template)
+# 2. Replace the placeholder values with your actual keystore information
+# 3. Generate a keystore using: keytool -genkey -v -keystore ~/keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+# 4. Add 'key.properties' to .gitignore to keep it secure 

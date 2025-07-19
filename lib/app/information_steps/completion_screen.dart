@@ -56,19 +56,49 @@ class CompletionScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: isSmallScreen ? 20 : 50),
-                // Success Icon
+                // Success GIF
                 Container(
-                  width: isTablet ? 120 : (isSmallScreen ? 80 : 100),
-                  height: isTablet ? 120 : (isSmallScreen ? 80 : 100),
+                  width: isTablet ? 200 : (isSmallScreen ? 150 : 210),
+                  height: isTablet ? 200 : (isSmallScreen ? 150 : 210),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Icon(
-                    Icons.check_circle,
-                    size: isTablet ? 70 : (isSmallScreen ? 50 : 60),
-                    color: Colors.green.shade600,
-                  ),
+                                      child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/images/tick2.gif',
+                        width: isTablet ? 200 : (isSmallScreen ? 150 : 180),
+                        height: isTablet ? 200 : (isSmallScreen ? 150 : 180),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading GIF: $error');
+                          // Try loading the alternative tick.gif
+                          return Image.asset(
+                            'assets/images/tick2.gif',
+                            width: isTablet ? 200 : (isSmallScreen ? 150 : 180),
+                            height: isTablet ? 200 : (isSmallScreen ? 150 : 180),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error2, stackTrace2) {
+                              print('Error loading alternative GIF: $error2');
+                              // Final fallback to icon
+                              return Container(
+                                width: isTablet ? 120 : (isSmallScreen ? 80 : 100),
+                                height: isTablet ? 120 : (isSmallScreen ? 80 : 100),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade100,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.check_circle,
+                                  size: isTablet ? 70 : (isSmallScreen ? 50 : 60),
+                                  color: Colors.green.shade600,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
                 ),
                 
                 
@@ -83,7 +113,7 @@ class CompletionScreen extends StatelessWidget {
                 // Profile Summary Card
                 
                 
-                SizedBox(height: isSmallScreen ? 40 : 80),
+                SizedBox(height: isSmallScreen ? 40 : 40),
                 
                 // Action Buttons
                 Column(
