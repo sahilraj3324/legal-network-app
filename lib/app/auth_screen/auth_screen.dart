@@ -88,7 +88,7 @@ class AuthScreen extends StatelessWidget {
                               child: Text(
                                 'Take a Step Closer to Advancing Your Legal Career',
                                 style: GoogleFonts.instrumentSans(
-                                  fontSize: isTablet ? 40 : (isSmallScreen ? 24 : 32),
+                                  fontSize: isTablet ? 28 : (isSmallScreen ? 20 : 24),
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   height: 1.3,
@@ -114,7 +114,7 @@ class AuthScreen extends StatelessWidget {
                         ],
                       ),
                       
-                      SizedBox(height: isSmallScreen ? 20 : 40),
+                      
                       
                       // Middle section with illustration
                       Container(
@@ -147,7 +147,7 @@ class AuthScreen extends StatelessWidget {
                         ),
                       ),
                       
-                      SizedBox(height: isSmallScreen ? 20 : 40),
+                      
                       
                       // Bottom section with buttons
                       Column(
@@ -211,7 +211,7 @@ class AuthScreen extends StatelessWidget {
                             ),
                           ),
                           
-                          SizedBox(height: isSmallScreen ? 16 : 24),
+                          
                           
                           // Terms and Privacy
                           Padding(
