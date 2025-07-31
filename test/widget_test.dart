@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leagel_1/onboarding_screen.dart';
+import 'package:leagel_1/app/onboarding_screen/onboarding_screen.dart';
 
 void main() {
   testWidgets('Onboarding screen displays correctly', (WidgetTester tester) async {

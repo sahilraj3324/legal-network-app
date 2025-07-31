@@ -8,7 +8,7 @@ import '../../model/user_model.dart';
 import '../../utils/fire_store_utils.dart';
 import '../../utils/constant.dart';
 import 'chat_screen.dart';
-import 'find_lawyers_screen.dart';
+import '../Find_lawyers/find_lawyers_screen.dart';
 
 class InboxScreen extends StatelessWidget {
   const InboxScreen({super.key});
@@ -452,7 +452,7 @@ class InboxScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: const Color(0xFF1565C0).withOpacity(0.1),
+                  backgroundColor: const Color(0xFF51D5FF).withOpacity(0.1),
                   child: Text(
                     otherUser.getDisplayName().isNotEmpty 
                         ? otherUser.getDisplayName()[0].toUpperCase()
@@ -472,7 +472,7 @@ class InboxScreen extends StatelessWidget {
                       width: 12,
                       height: 12,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF1565C0),
+                        color: Color(0xFF51D5FF),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -496,7 +496,7 @@ class InboxScreen extends StatelessWidget {
                     otherUser.specializations!.first,
                     style: GoogleFonts.instrumentSans(
                       fontSize: 12,
-                      color: const Color(0xFF1565C0),
+                      color: const Color(0xFF51D5FF),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -521,7 +521,7 @@ class InboxScreen extends StatelessWidget {
                   _formatTime(inbox.timestamp),
                   style: GoogleFonts.instrumentSans(
                     fontSize: 12,
-                    color: isUnread ? const Color(0xFF1565C0) : Colors.grey.shade500,
+                    color: isUnread ? const Color(0xFF51D5FF) : Colors.grey.shade500,
                     fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
@@ -530,7 +530,7 @@ class InboxScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1565C0),
+                      color: const Color(0xFF51D5FF),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(

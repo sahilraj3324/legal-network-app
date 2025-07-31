@@ -6,7 +6,7 @@ import '../../model/user_model.dart';
 import '../../utils/fire_store_utils.dart';
 import '../../utils/constant.dart';
 import '../../controller/lawyer_filter_controller.dart';
-import 'chat_screen.dart';
+import '../chat/chat_screen.dart';
 
 class FindLawyersScreen extends StatelessWidget {
   const FindLawyersScreen({super.key});
@@ -17,15 +17,15 @@ class FindLawyersScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1565C0),
-        foregroundColor: Colors.white,
+        backgroundColor:  Colors.white,
+        foregroundColor: Colors.black,
         elevation: 2,
         title: Text(
-          'Find Lawyers',
+          'Find Profiles',
           style: GoogleFonts.instrumentSans(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         actions: [
@@ -35,7 +35,7 @@ class FindLawyersScreen extends StatelessWidget {
                 onPressed: () {
                   _showFilterDialog(context, filterController);
                 },
-                icon: const Icon(Icons.filter_list, color: Colors.white),
+                icon: const Icon(Icons.filter_list, color: Colors.black),
               ),
               if (filterController.hasActiveFilters)
                 Positioned(
@@ -261,17 +261,7 @@ class FindLawyersScreen extends StatelessWidget {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (lawyer.email != null && lawyer.email!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          lawyer.email!,
-                          style: GoogleFonts.instrumentSans(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                      
                       if (lawyer.city != null && lawyer.city!.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Row(
@@ -299,8 +289,8 @@ class FindLawyersScreen extends StatelessWidget {
                 // Chat button
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1565C0),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFF51D5FF),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                   child: IconButton(
                     onPressed: () {
@@ -308,6 +298,7 @@ class FindLawyersScreen extends StatelessWidget {
                         'receiverModel': lawyer,
                       });
                     },
+                   
                     icon: const Icon(
                       Icons.chat,
                       color: Colors.white,
