@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:leagel_1/app/hello_screen.dart';
 import 'package:leagel_1/utils/show_toast_dialog.dart';
 import 'package:leagel_1/model/user_model.dart';
+import '../app/main_navigation.dart';
 import 'package:leagel_1/model/city_model.dart';
 import 'package:leagel_1/model/court_model.dart';
 import 'package:leagel_1/utils/fire_store_utils.dart';
@@ -24,7 +24,6 @@ class InformationController extends GetxController {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-  final TextEditingController servicesController = TextEditingController();
   final TextEditingController courtsController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController completeAddressController = TextEditingController();
@@ -37,6 +36,7 @@ class InformationController extends GetxController {
   RxString profileImage = "".obs;
   RxString selectedUserType = "individual".obs; // "individual" or "law_firm"
   RxList<String> selectedSpecializations = <String>[].obs;
+  RxList<String> selectedServices = <String>[].obs; // List of selected services (max 10)
   RxBool isAddressPublic = true.obs;
   RxList<String> selectedLanguages = <String>[].obs; // List of selected languages (max 2)
   RxBool isLoading = false.obs;
@@ -74,6 +74,9 @@ class InformationController extends GetxController {
         }
         if (userModel.value.specializations != null) {
           selectedSpecializations.value = userModel.value.specializations!;
+        }
+        if (userModel.value.services != null) {
+          selectedServices.value = userModel.value.services!;
         }
         if (userModel.value.city != null) {
           cityController.text = userModel.value.city!;
@@ -123,6 +126,7 @@ class InformationController extends GetxController {
         emailController.text.trim().isEmpty ||
         phoneNumberController.text.trim().isEmpty ||
         selectedSpecializations.isEmpty ||
+        selectedServices.isEmpty ||
         cityController.text.trim().isEmpty ||
         completeAddressController.text.trim().isEmpty ||
         yearsOfExperienceController.text.trim().isEmpty ||
@@ -160,8 +164,20 @@ class InformationController extends GetxController {
   void toggleSpecialization(String specialization) {
     if (selectedSpecializations.contains(specialization)) {
       selectedSpecializations.remove(specialization);
+      // Clear services when specialization is deselected
+      selectedServices.clear();
     } else if (selectedSpecializations.length < 3) {
       selectedSpecializations.add(specialization);
+    }
+    update();
+  }
+
+  // Method for handling service selection (max 10)
+  void toggleService(String service) {
+    if (selectedServices.contains(service)) {
+      selectedServices.remove(service);
+    } else if (selectedServices.length < 10) {
+      selectedServices.add(service);
     }
     update();
   }
@@ -267,7 +283,7 @@ class InformationController extends GetxController {
         userType: selectedUserType.value,
         fullName: "Adv. ${fullNameController.text.trim()}",
         specializations: selectedSpecializations.toList(),
-        services: servicesController.text.trim().split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList(),
+        services: selectedServices.toList(),
         courts: courtsController.text.trim().split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList(),
         city: cityController.text.trim(),
         completeAddress: completeAddressController.text.trim(),
@@ -373,17 +389,17 @@ class InformationController extends GetxController {
       print('Completing registration...');
       ShowToastDialog.showToast("Welcome to Legal Network! You can now explore the app.");
       
-      // Navigate to hello screen with proper context check
+   
       Future.delayed(const Duration(milliseconds: 500), () {
         if (Get.context != null) {
-          Get.offAll(() => const HelloScreen());
+          Get.offAll(() => const MainNavigationScreen());
         }
       });
     } catch (e) {
       print('Error completing registration: $e');
       ShowToastDialog.showToast("Registration completed successfully!");
       if (Get.context != null) {
-        Get.offAll(() => const HelloScreen());
+        Get.offAll(() => const MainNavigationScreen());
       }
     }
   }
@@ -431,7 +447,6 @@ class InformationController extends GetxController {
     fullNameController.dispose();
     emailController.dispose();
     phoneNumberController.dispose();
-    servicesController.dispose();
     courtsController.dispose();
     cityController.dispose();
     completeAddressController.dispose();

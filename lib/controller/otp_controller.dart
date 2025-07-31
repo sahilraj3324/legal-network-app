@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/show_toast_dialog.dart';
 import '../app/information_screen/information_screen.dart';
-import '../app/hello_screen.dart';
+import '../app/main_navigation.dart';
 import '../model/user_model.dart';
 import '../utils/fire_store_utils.dart';
 
@@ -177,9 +177,9 @@ class OtpController extends GetxController {
       if (existingUser != null && 
           existingUser.fullName != null && 
           existingUser.fullName!.isNotEmpty) {
-        // User exists and has completed profile - go to hello screen
-        print('User already exists, navigating to hello screen');
-        Get.offAll(() => const HelloScreen());
+        
+        print('User already exists');
+        Get.offAll(() => const MainNavigationScreen());
       } else {
         // User doesn't exist or hasn't completed profile - go to information screen
         print('User doesn\'t exist, navigating to information screen');

@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users collection - users can read/write their own profile and read others for chat
+    match /users/{userId} {
+      // Allow users to read any user profile (needed for chat display)
+      allow read: if request.auth != null;
+      
+      // Allow users to write only their own profile
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Chat collection - main chat structure
+    match /chat/{userId} {
+      // Allow access only if the user is authenticated and accessing their own chat data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Inbox subcollection - conversation summaries
+      match /inbox/{otherUserId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Individual chat messages between users
+      match /{otherUserId}/{messageId} {
+        allow read, write: if request.auth != null && 
+          (request.auth.uid == userId || request.auth.uid == otherUserId);
+      }
+    }
+    
+    // Additional rule to allow users to write to other user's chat collections
+    // This is needed when User A sends a message to User B
+    match /chat/{receiverId}/inbox/{senderId} {
+      allow write: if request.auth != null && request.auth.uid == senderId;
+    }
+    
+    match /chat/{receiverId}/{senderId}/{messageId} {
+      allow write: if request.auth != null && request.auth.uid == senderId;
+    }
+    
+    // States and cities collection - read-only for all authenticated users
+    match /states_cities/{document=**} {
+      allow read: if request.auth != null;
+    }
+    
+    // Courts collection - read-only for all authenticated users  
+    match /courts/{document=**} {
+      allow read: if request.auth != null;
+    }
+    
+    // Default rule - deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 

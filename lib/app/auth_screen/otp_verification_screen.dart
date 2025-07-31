@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import '../../utils/firebase_service.dart';
 import '../information_screen/information_screen.dart';
-import '../hello_screen.dart';
+import '../main_navigation.dart';
 import '../../model/user_model.dart';
 import '../../utils/fire_store_utils.dart';
 
@@ -440,10 +440,10 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       if (existingUser != null && 
           existingUser.fullName != null && 
           existingUser.fullName!.isNotEmpty) {
-        // User exists and has completed profile - go to hello screen
-        print('User already exists, navigating to hello screen');
+       
+        print('User already exists');
         if (Get.context != null) {
-          Get.offAll(() => const HelloScreen());
+          Get.offAll(() => const MainNavigationScreen());
         }
       } else {
         // User doesn't exist or hasn't completed profile - go to information screen

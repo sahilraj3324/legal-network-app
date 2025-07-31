@@ -21,7 +21,7 @@ class UserModel {
   String? userType; // "individual" or "law_firm"
   String? fullName; // Name with "Adv." prefix
   List<String>? specializations; // Multiple specializations
-  List<String>? services; // Services offered
+  List<String>? services; // Services offered - Changed from String to List<String>
   List<String>? courts; // Courts they practice in
   String? city;
   String? completeAddress;

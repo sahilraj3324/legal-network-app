@@ -7,6 +7,144 @@ import 'package:leagel_1/app/widgets/searchable_court_dropdown.dart';
 class PersonalInfoScreen extends StatelessWidget {
   const PersonalInfoScreen({super.key});
 
+  // Specializations and Services mapping
+  static const Map<String, List<String>> specializationServices = {
+    'CIVIL MATTERS': [
+      'Property Disputes',
+      'Family Property Disputes',
+      'Partition Disputes',
+      'Wrongful Possession Disputes',
+      'Money Recovery Disputes',
+      'Landlord Tenant Disputes',
+      'Name Change',
+      'Succession Certificate',
+      'Consumer Complaints',
+      'NRI property issues',
+      'Illegal construction',
+      'Builder Delay/Fraud',
+      'Arbitration',
+    ],
+    'CRIMINAL MATTERS': [
+      'Bail/Anticipatory Bail',
+      'Bail Lawyer',
+      'Corruption',
+      'Defamation',
+      'FIR filing/quashing',
+      'Murder/Attempt to Murder',
+      'Narcotic/Drugs',
+      'Physical/Sexual Abuse',
+      'Summons/Warrants',
+      'Police Not filing FIR',
+      'Theft/Robbery',
+      'Threat/Injury',
+      'Cyber Crimes',
+      'Traffic Challans',
+      'Dowry Death',
+      'Arrest',
+      'Criminal Complaints',
+      'Cheque Bounce',
+    ],
+    'FAMILY MATTERS': [
+      'Mutual Consent Divorce',
+      'Divorce / Talaq',
+      'Reply /sent legal notice for Divorce',
+      'Appeal in Divorce Case',
+      'Dowry Demand',
+      'Domestic Violence',
+      'Abuse',
+      'Alimony',
+      'Maintenance',
+      'Child Custody',
+      'NRI Divorce Matters',
+      'Restitution of Conjugal Rights',
+      'Complaint before CAW Cell',
+      'Family Partition',
+      'Will Drafting',
+      'Adoption and Guardianship',
+    ],
+    'LABOUR/EMPLOYEE MATTERS': [
+      'Sexual Harassment Complaints',
+      'Payment of Bonus',
+      'Maternity Benefits',
+      'Illegal / Wrongful Termination',
+      'Compensation/Claims',
+      'Breach of Employment Contract',
+      'Labour Union Matters',
+      'Suspension and Termination from Central Govt/ State Govt /PSU Services',
+      'Service matters',
+    ],
+    'TAXATION MATTERS': [
+      'Income Tax filing',
+      'Income Tax Refund',
+      'Income Tax Scrutiny',
+      'Income Tax Appeals',
+      'Sales Tax and VAT Advices',
+      'GST filing',
+      'GST Registration',
+      'GST Disputes',
+    ],
+    'DOCUMENTATION & REGISTRATION': [
+      'Power of attorney',
+      'Gift Deed Registration',
+      'Sale Deed Registration',
+      'Partition Deed Registration',
+      'Will Registration',
+      'Relinquishment Deed Registration',
+      'Rent Agreement/ Lease Agreement',
+      'Property Verification',
+      'Court Marriage/Marriage Registration',
+    ],
+    'TRADEMARK & COPYRIGHT MATTERS': [
+      'Filing defending of patent matters',
+      'Filing defending of Copyright matters',
+      'Filing defending of Trademark Matters',
+      'Trademark Violations',
+      'Patent Violations',
+      'Copyright Violation',
+    ],
+    'HIGH COURT MATTERS': [
+      'High Court case filing',
+      'Appeals',
+      'Writs',
+      'Revision',
+      'Review',
+      'PIL',
+      'Couple Protection',
+    ],
+    'SUPREME COURT MATTERS': [
+      'Supreme Court case filing',
+      'Appeals',
+      'Writs',
+      'Revision',
+      'Review',
+      'PIL',
+      'Advocate on Record (AOR)',
+    ],
+    'FORUMS AND TRIBUNAL MATTERS': [
+      'Consumer Complaints',
+      'RERA',
+      'Debt Recovery Tribunals',
+      'Municipal Tribunals',
+      'CLAT',
+      'NCLT',
+      'MACT',
+    ],
+    'BUSINESS MATTERS': [
+      'Private Limited Company Registration',
+      'LLP Company Registration',
+      'Public Limited Company Registration',
+      'One Person Company Registration',
+      'Nidhi Company Registration',
+      'Section 8 Company Registration',
+      'GST Registration',
+      'Trademark Registration',
+      'ISO Certification',
+      'FSSAI Registration',
+      'Digital Signature Certificate',
+      'IEC Registration',
+    ],
+  };
+
   @override
   Widget build(BuildContext context) {
     final controller = InformationController.instance;
@@ -292,37 +430,25 @@ class PersonalInfoScreen extends StatelessWidget {
               Obx(() => _buildSpecializationSection(controller)),
               const SizedBox(height: 24),
               
-              // Services
-              const Text(
-                'Services',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: controller.servicesController,
-                decoration: InputDecoration(
-                  hintText: 'Enter services (comma separated)',
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+              // Services - Only show if specializations are selected
+              Obx(() => controller.selectedSpecializations.isNotEmpty
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Services (Select up to 10)',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildServicesSection(controller),
+                        const SizedBox(height: 24),
+                      ],
+                    )
+                  : const SizedBox()),
 
               // City
               const Text(
@@ -590,20 +716,7 @@ class PersonalInfoScreen extends StatelessWidget {
   }
 
   Widget _buildSpecializationSection(InformationController controller) {
-    final List<String> specializations = [
-      'Criminal Matter',
-      'Civil Matter',
-      'Family Matter',
-      'Corporate Law',
-      'Tax Law',
-      'Property Law',
-      'Labour Law',
-      'Constitutional Law',
-      'Environmental Law',
-      'Intellectual Property',
-      'Immigration Law',
-      'Banking Law',
-    ];
+    final List<String> specializations = specializationServices.keys.toList();
 
     return Column(
       children: [
@@ -618,7 +731,7 @@ class PersonalInfoScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Select your specializations (you can select upto 3)',
+                'Select your specializations (you can select up to 3)',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -634,7 +747,7 @@ class PersonalInfoScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: canSelect ? () => controller.toggleSpecialization(specialization) : null,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.blue.shade50 : (canSelect ? Colors.white : Colors.grey.shade100),
                         border: Border.all(
@@ -645,7 +758,7 @@ class PersonalInfoScreen extends StatelessWidget {
                       child: Text(
                         specialization,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: isSelected ? Colors.blue : (canSelect ? Colors.black : Colors.grey.shade400),
                         ),
@@ -662,6 +775,92 @@ class PersonalInfoScreen extends StatelessWidget {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               'Please select at least one specialization',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.red,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildServicesSection(InformationController controller) {
+    // Get all services for selected specializations
+    List<String> availableServices = [];
+    for (String specialization in controller.selectedSpecializations) {
+      if (specializationServices.containsKey(specialization)) {
+        availableServices.addAll(specializationServices[specialization]!);
+      }
+    }
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select services for your selected specializations (up to 10) - ${controller.selectedServices.length}/10 selected',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (availableServices.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: availableServices.map((service) {
+                    final isSelected = controller.selectedServices.contains(service);
+                    final canSelect = controller.selectedServices.length < 10 || isSelected;
+                    return GestureDetector(
+                      onTap: canSelect ? () => controller.toggleService(service) : null,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.green.shade50 : (canSelect ? Colors.white : Colors.grey.shade100),
+                          border: Border.all(
+                            color: isSelected ? Colors.green : (canSelect ? Colors.grey.shade300 : Colors.grey.shade200),
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          service,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected ? Colors.green.shade700 : (canSelect ? Colors.black : Colors.grey.shade400),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                )
+              else
+                const Text(
+                  'Please select at least one specialization to view available services',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        if (controller.selectedServices.isEmpty && controller.selectedSpecializations.isNotEmpty)
+          const Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: Text(
+              'Please select at least one service',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.red,

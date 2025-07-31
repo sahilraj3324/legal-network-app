@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/fire_store_utils.dart';
 import '../model/user_model.dart';
-import '../app/hello_screen.dart';
+import '../app/main_navigation.dart';
 import '../app/onboarding_screen/onboarding_screen.dart';
 
 class AuthController extends GetxController {
@@ -45,8 +45,8 @@ class AuthController extends GetxController {
             userModel.fullName!.isNotEmpty) {
           // User is authenticated and has completed profile
           isAuthenticated.value = true;
-          print('User profile is complete, navigating to hello screen');
-          _navigateToScreen(() => const HelloScreen());
+          print('User profile is complete');
+          _navigateToScreen(() => const MainNavigationScreen());
         } else {
           // User is authenticated but hasn't completed profile
           isAuthenticated.value = false;
