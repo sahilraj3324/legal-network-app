@@ -6,6 +6,7 @@ import '../../controller/chat_controller.dart';
 import '../../model/chat_model.dart';
 import '../../utils/fire_store_utils.dart';
 import '../../utils/constant.dart';
+import '../../widgets/profile_avatar.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({super.key});
@@ -21,20 +22,13 @@ class ChatScreen extends StatelessWidget {
         elevation: 2,
         title: Obx(() => Row(
           children: [
-            CircleAvatar(
+            Obx(() => ProfileAvatar(
+              user: controller.receiverUserModel.value,
               radius: 16,
-              backgroundColor: Colors.black.withOpacity(0.2),
-              child: Text(
-                controller.receiverUserModel.value.getDisplayName().isNotEmpty 
-                    ? controller.receiverUserModel.value.getDisplayName()[0].toUpperCase()
-                    : 'U',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ),
+              backgroundColor: Colors.white,
+              textColor: Colors.black,
+              fontSize: 14,
+            )),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

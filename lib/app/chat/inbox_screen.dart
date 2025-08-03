@@ -7,8 +7,10 @@ import '../Profile/profile_screen.dart';
 import '../../model/user_model.dart';
 import '../../utils/fire_store_utils.dart';
 import '../../utils/constant.dart';
+import '../../widgets/profile_avatar.dart';
 import 'chat_screen.dart';
 import '../Find_lawyers/find_lawyers_screen.dart';
+import '../hello_screen/hello_screen.dart';
 
 class InboxScreen extends StatelessWidget {
   const InboxScreen({super.key});
@@ -47,103 +49,111 @@ class InboxScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ===== Row 1: Logo + Notification + Profile =====
-                  Row(
-                    children: [
-                      // Logo + App Name
-                      Flexible(
-                        flex: 4,
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/Logo.png',
-                              height: screenWidth * 0.17,
-                            ),
-                            SizedBox(width: screenWidth * 0.02),
-                            
-                          ],
-                        ),
-                      ),
+                 Row(
+  children: [
+    // Logo + App Name
+    Row(
+      children: [
+        Image.asset(
+          'assets/images/Logo.png',
+          height: screenWidth * 0.17,
+        ),
+        SizedBox(width: screenWidth * 0.02),
+        // ... you can put your app name here if needed ...
+      ],
+    ),
 
-                      const Spacer(),
+    const Spacer(), // pushes everything after this to the right
 
-                      // Notification Icon with Badge
-                      Flexible(
-                        flex: 2,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  Get.to(() => const FindLawyersScreen());
-                                },
-                                icon: Icon(
-                                  Icons.notifications_outlined,
-                                  color: Colors.grey.shade700,
-                                  size: screenWidth * 0.05,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 6,
-                              top: 6,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                constraints: const BoxConstraints(
-                                  minWidth: 16,
-                                  minHeight: 16,
-                                ),
-                                child: Text(
-                                  '2',
-                                  style: GoogleFonts.instrumentSans(
-                                    color: Colors.white,
-                                    fontSize: screenWidth * 0.025,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+    // Notification Icon with Badge
+    Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(right: 12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IconButton(
+            onPressed: () {
+              Get.to(() => const FindLawyersScreen());
+            },
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: Colors.grey.shade700,
+              size: screenWidth * 0.05,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 6,
+          top: 6,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+            constraints: const BoxConstraints(
+              minWidth: 16,
+              minHeight: 16,
+            ),
+            child: Text(
+              '2',
+              style: GoogleFonts.instrumentSans(
+                color: Colors.white,
+                fontSize: screenWidth * 0.025,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    ),
 
-                      // Profile Image
-                      GestureDetector(
-                        onTap: () {
-                          Get.to(() => const ProfileScreen());
-                        },
-                        child: Container(
-                          width: screenWidth * 0.1,
-                          height: screenWidth * 0.1,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1565C0).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(
-                              color: const Color(0xFF1565C0).withOpacity(0.2),
-                              width: 2,
-                            ),
-                            image: const DecorationImage(
-                              image: AssetImage('assets/profile.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
+    // Profile Image
+    GestureDetector(
+      onTap: () {
+        Get.to(() => const HelloScreen());
+      },
+      child: FutureBuilder<UserModel?>(
+        future: FireStoreUtils.getCurrentUser(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return ProfileAvatar(
+              user: snapshot.data!,
+              radius: screenWidth * 0.05,
+              showBorder: true,
+              borderColor: const Color(0xFF1565C0),
+              borderWidth: 2,
+            );
+          }
+          // Fallback to loading or default avatar
+          return Container(
+            width: screenWidth * 0.1,
+            height: screenWidth * 0.1,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1565C0).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(
+                color: const Color(0xFF1565C0).withOpacity(0.2),
+                width: 2,
+              ),
+            ),
+            child: Icon(
+              Icons.person,
+              color: const Color(0xFF1565C0),
+              size: screenWidth * 0.04,
+            ),
+          );
+        },
+      ),
+    ),
+  ],
+),
                   SizedBox(height: screenWidth * 0.04),
-
                   // ===== Row 2: Search Bar + New Group =====
                   Row(
                     children: [
@@ -170,12 +180,9 @@ class InboxScreen extends StatelessWidget {
                         ),
                       ),
                       // New Group Button
-                    
                     ],
                   ),
-
                   SizedBox(height: screenWidth * 0.05),
-
                   // ===== Row 3: Title + Action Buttons =====
                   SingleChildScrollView(
   scrollDirection: Axis.horizontal,
@@ -450,19 +457,9 @@ class InboxScreen extends StatelessWidget {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: Stack(
               children: [
-                CircleAvatar(
+                ProfileAvatar(
+                  user: otherUser,
                   radius: 24,
-                  backgroundColor: const Color(0xFF51D5FF).withOpacity(0.1),
-                  child: Text(
-                    otherUser.getDisplayName().isNotEmpty 
-                        ? otherUser.getDisplayName()[0].toUpperCase()
-                        : 'U',
-                    style: GoogleFonts.instrumentSans(
-                      color: const Color(0xFF1565C0),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
                 ),
                 if (isUnread)
                   Positioned(

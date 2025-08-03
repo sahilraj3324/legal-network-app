@@ -1,6 +1,146 @@
 import 'package:get/get.dart';
+import '../model/city_model.dart';
+import '../model/court_model.dart';
 
 class LawyerFilterController extends GetxController {
+  // Specializations and Services mapping
+  static const Map<String, List<String>> specializationServices = {
+    'CIVIL MATTERS': [
+      'Property Disputes',
+      'Family Property Disputes',
+      'Partition Disputes',
+      'Wrongful Possession Disputes',
+      'Money Recovery Disputes',
+      'Landlord Tenant Disputes',
+      'Name Change',
+      'Succession Certificate',
+      'Consumer Complaints',
+      'NRI property issues',
+      'Illegal construction',
+      'Builder Delay/Fraud',
+      'Arbitration',
+    ],
+    'CRIMINAL MATTERS': [
+      'Bail/Anticipatory Bail',
+      'Bail Lawyer',
+      'Corruption',
+      'Defamation',
+      'FIR filing/quashing',
+      'Murder/Attempt to Murder',
+      'Narcotic/Drugs',
+      'Physical/Sexual Abuse',
+      'Summons/Warrants',
+      'Police Not filing FIR',
+      'Theft/Robbery',
+      'Threat/Injury',
+      'Cyber Crimes',
+      'Traffic Challans',
+      'Dowry Death',
+      'Arrest',
+      'Criminal Complaints',
+      'Cheque Bounce',
+    ],
+    'FAMILY MATTERS': [
+      'Mutual Consent Divorce',
+      'Divorce / Talaq',
+      'Reply /sent legal notice for Divorce',
+      'Appeal in Divorce Case',
+      'Dowry Demand',
+      'Domestic Violence',
+      'Abuse',
+      'Alimony',
+      'Maintenance',
+      'Child Custody',
+      'NRI Divorce Matters',
+      'Restitution of Conjugal Rights',
+      'Complaint before CAW Cell',
+      'Family Partition',
+      'Will Drafting',
+      'Adoption and Guardianship',
+    ],
+    'LABOUR/EMPLOYEE MATTERS': [
+      'Sexual Harassment Complaints',
+      'Payment of Bonus',
+      'Maternity Benefits',
+      'Illegal / Wrongful Termination',
+      'Compensation/Claims',
+      'Breach of Employment Contract',
+      'Labour Union Matters',
+      'Suspension and Termination from Central Govt/ State Govt /PSU Services',
+      'Service matters',
+    ],
+    'TAXATION MATTERS': [
+      'Income Tax filing',
+      'Income Tax Refund',
+      'Income Tax Scrutiny',
+      'Income Tax Appeals',
+      'Sales Tax and VAT Advices',
+      'GST filing',
+      'GST Registration',
+      'GST Disputes',
+    ],
+    'DOCUMENTATION & REGISTRATION': [
+      'Power of attorney',
+      'Gift Deed Registration',
+      'Sale Deed Registration',
+      'Partition Deed Registration',
+      'Will Registration',
+      'Relinquishment Deed Registration',
+      'Rent Agreement/ Lease Agreement',
+      'Property Verification',
+      'Court Marriage/Marriage Registration',
+    ],
+    'TRADEMARK & COPYRIGHT MATTERS': [
+      'Filing defending of patent matters',
+      'Filing defending of Copyright matters',
+      'Filing defending of Trademark Matters',
+      'Trademark Violations',
+      'Patent Violations',
+      'Copyright Violation',
+    ],
+    'HIGH COURT MATTERS': [
+      'High Court case filing',
+      'Appeals',
+      'Writs',
+      'Revision',
+      'Review',
+      'PIL',
+      'Couple Protection',
+    ],
+    'SUPREME COURT MATTERS': [
+      'Supreme Court case filing',
+      'Appeals',
+      'Writs',
+      'Revision',
+      'Review',
+      'PIL',
+      'Advocate on Record (AOR)',
+    ],
+    'FORUMS AND TRIBUNAL MATTERS': [
+      'Consumer Complaints',
+      'RERA',
+      'Debt Recovery Tribunals',
+      'Municipal Tribunals',
+      'CLAT',
+      'NCLT',
+      'MACT',
+    ],
+    'BUSINESS MATTERS': [
+      'Private Limited Company Registration',
+      'LLP Company Registration',
+      'Public Limited Company Registration',
+      'One Person Company Registration',
+      'Nidhi Company Registration',
+      'Section 8 Company Registration',
+      'GST Registration',
+      'Trademark Registration',
+      'ISO Certification',
+      'FSSAI Registration',
+      'Digital Signature Certificate',
+      'IEC Registration',
+    ],
+  };
+
   // Selected filters
   RxList<String> selectedSpecializations = <String>[].obs;
   RxList<String> selectedServices = <String>[].obs;
@@ -14,6 +154,22 @@ class LawyerFilterController extends GetxController {
   
   // Search text
   RxString searchText = ''.obs;
+  
+  // Filter section visibility
+  RxBool showFilters = false.obs;
+  
+  // Individual section expand/collapse states
+  RxBool showSpecializations = false.obs;
+  RxBool showServices = false.obs;
+  RxBool showLocations = false.obs;
+  RxBool showCourts = false.obs;
+  RxBool showLanguages = false.obs;
+  RxBool showExperience = false.obs;
+  RxBool showUserTypes = false.obs;
+  
+  // City and Court selection
+  Rx<City?> selectedCity = Rx<City?>(null);
+  Rx<Court?> selectedCourt = Rx<Court?>(null);
   
   // Legal Specializations - Comprehensive list
   final List<String> allSpecializations = [
@@ -341,9 +497,12 @@ class LawyerFilterController extends GetxController {
   void toggleSpecialization(String specialization) {
     if (selectedSpecializations.contains(specialization)) {
       selectedSpecializations.remove(specialization);
+      // Clear services that are no longer available
+      _clearInvalidServices();
     } else {
       selectedSpecializations.add(specialization);
     }
+    update();
   }
   
   void toggleService(String service) {
@@ -352,14 +511,18 @@ class LawyerFilterController extends GetxController {
     } else {
       selectedServices.add(service);
     }
+    update();
   }
   
   void toggleCity(String city) {
     if (selectedCities.contains(city)) {
       selectedCities.remove(city);
+      // Clear courts that are no longer available
+      _clearInvalidCourts();
     } else {
       selectedCities.add(city);
     }
+    update();
   }
   
   void toggleCourt(String court) {
@@ -368,6 +531,7 @@ class LawyerFilterController extends GetxController {
     } else {
       selectedCourts.add(court);
     }
+    update();
   }
   
   void toggleLanguage(String language) {
@@ -376,6 +540,7 @@ class LawyerFilterController extends GetxController {
     } else {
       selectedLanguages.add(language);
     }
+    update();
   }
   
   void toggleUserType(String userType) {
@@ -385,14 +550,17 @@ class LawyerFilterController extends GetxController {
     } else {
       selectedUserTypes.add(mappedType);
     }
+    update();
   }
   
   void setExperience(String experience) {
     selectedExperience.value = experience;
+    update();
   }
   
   void setSearchText(String text) {
     searchText.value = text;
+    update();
   }
   
   void clearAllFilters() {
@@ -404,6 +572,75 @@ class LawyerFilterController extends GetxController {
     selectedUserTypes.clear();
     selectedExperience.value = '';
     searchText.value = '';
+    selectedCity.value = null;
+    selectedCourt.value = null;
+    update();
+  }
+
+  void toggleFilters() {
+    showFilters.value = !showFilters.value;
+    update();
+  }
+
+  // Individual section toggles
+  void toggleSpecializations() {
+    showSpecializations.value = !showSpecializations.value;
+    update();
+  }
+
+  void toggleServices() {
+    showServices.value = !showServices.value;
+    update();
+  }
+
+  void toggleLocations() {
+    showLocations.value = !showLocations.value;
+    update();
+  }
+
+  void toggleCourts() {
+    showCourts.value = !showCourts.value;
+    update();
+  }
+
+  void toggleLanguages() {
+    showLanguages.value = !showLanguages.value;
+    update();
+  }
+
+  void toggleExperience() {
+    showExperience.value = !showExperience.value;
+    update();
+  }
+
+  void toggleUserTypes() {
+    showUserTypes.value = !showUserTypes.value;
+    update();
+  }
+
+  // City and Court selection methods (from information_controller.dart)
+  void onCitySelected(City? city) {
+    selectedCity.value = city;
+    if (city != null) {
+      // Add city to selected cities if not already there
+      if (!selectedCities.contains(city.city)) {
+        selectedCities.add(city.city);
+      }
+      // Clear selected court when city changes
+      selectedCourt.value = null;
+    }
+    update();
+  }
+
+  void onCourtSelected(Court? court) {
+    selectedCourt.value = court;
+    if (court != null) {
+      // Add court to selected courts if not already there
+      if (!selectedCourts.contains(court.courtName)) {
+        selectedCourts.add(court.courtName);
+      }
+    }
+    update();
   }
   
   bool get hasActiveFilters {
@@ -428,5 +665,48 @@ class LawyerFilterController extends GetxController {
     if (selectedExperience.value.isNotEmpty) count++;
     if (searchText.value.isNotEmpty) count++;
     return count;
+  }
+
+  // Get available services based on selected specializations
+  List<String> get availableServices {
+    if (selectedSpecializations.isEmpty) {
+      return allServices; // Show all services if no specializations selected
+    }
+    
+    List<String> services = [];
+    for (String specialization in selectedSpecializations) {
+      if (specializationServices.containsKey(specialization)) {
+        services.addAll(specializationServices[specialization]!);
+      }
+    }
+    return services.toSet().toList(); // Remove duplicates
+  }
+
+  // Get available courts based on selected cities (filter by state)
+  List<String> get availableCourts {
+    if (selectedCities.isEmpty) {
+      return courtTypes; // Show all courts if no cities selected
+    }
+    
+    // For now, return all courts. In a real implementation, you would:
+    // 1. Map cities to their states
+    // 2. Filter courts by state
+    // Since we don't have city-state mapping in the current structure,
+    // we'll return all courts for now
+    return courtTypes;
+  }
+
+
+
+  // Helper method to clear services that are no longer valid
+  void _clearInvalidServices() {
+    List<String> validServices = availableServices;
+    selectedServices.removeWhere((service) => !validServices.contains(service));
+  }
+
+  // Helper method to clear courts that are no longer valid
+  void _clearInvalidCourts() {
+    List<String> validCourts = availableCourts;
+    selectedCourts.removeWhere((court) => !validCourts.contains(court));
   }
 } 

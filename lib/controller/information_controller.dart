@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -257,8 +258,14 @@ class InformationController extends GetxController {
             "profileImage/$currentUid",
             File(profileImage.value).path.split('/').last,
           );
+          
+          if (profileImageUrl.isEmpty) {
+            print('⚠️  Profile image upload failed, continuing without image');
+          } else {
+            print('✅ Profile image uploaded successfully: $profileImageUrl');
+          }
         } catch (e) {
-          print('Error uploading profile image: $e');
+          print('❌ Error uploading profile image: $e');
           // Continue without profile image
         }
       }
@@ -404,11 +411,37 @@ class InformationController extends GetxController {
     }
   }
 
-  // Placeholder for image upload function
+  // Firebase Storage upload function
   Future<String> uploadUserImageToFireStorage(File file, String path, String fileName) async {
-    // This should be implemented with your Firebase Storage logic
-    // For now, returning the local path
-    return file.path;
+    try {
+      print('📤 Starting upload to Firebase Storage...');
+      print('   File path: ${file.path}');
+      print('   Storage path: $path');
+      print('   File name: $fileName');
+      
+      // Get firebase_storage instance
+      final firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
+      
+      // Create a reference to the file location
+      final firebase_storage.Reference ref = storage.ref().child(path).child(fileName);
+      
+      // Upload the file
+      final firebase_storage.UploadTask uploadTask = ref.putFile(file);
+      
+      // Wait for upload to complete
+      final firebase_storage.TaskSnapshot snapshot = await uploadTask;
+      
+      // Get the download URL
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      print('✅ Upload successful! Download URL: $downloadUrl');
+      return downloadUrl;
+      
+    } catch (e) {
+      print('❌ Error uploading to Firebase Storage: $e');
+      // Return empty string on error so we can handle it gracefully
+      return '';
+    }
   }
 
   // City selection methods
